@@ -18,7 +18,7 @@
 
       <div id="download">
         <a href="<page download/download-easy>">
-          <span class="download-tor">Download Tor</span></a>
+          <span class="download-tor">Download<br>Tor Browser</span></a>
       </div>
       </div>
         <div class="subcol-container clearfix">
