@@ -4,6 +4,9 @@
 
 #include "donatehead.wmi" TITLE="Donate to keep Tor alive!" CHARSET="UTF-8"
 
+<script src="https://checkout.stripe.com/checkout.js"></script>
+<script src="https://torpat.ch/stripe/stripe-tor.js"></script>
+
 <div class="donation">
           
       <div class="quote-section">
@@ -88,9 +91,10 @@ Tor is an essential part of the Internet freedom infrastructure, and I'm looking
               </div>
             </div>
             <div style="padding: 0 15px;">
-              <h5 class="error-msg">The minimum donation amount is $5</h5>
-              <button id="donate-btn" class="btn btn-primary btn-lg btn-block donate-button" style="padding:10px;">Donate</button>
-              <h5>via PayPal (doesn't require an account)</h5>
+              <h5 id="amount-error-msg" class="error-msg">The minimum donation amount is $5</h5>
+              <h5 id="stripe-error-msg" class="error-msg"></h5>
+              <button id="donate-stripe-btn" class="btn btn-primary btn-lg btn-block donate-button" style="padding:10px;">Donate by Credit Card</button>
+              <button id="donate-btn" class="btn btn-primary btn-lg btn-block donate-button" style="padding:10px;">Donate via PayPal</button>
               <h4><a href="<page donate/donate-options>">Other Ways to Donate</a></h4>
             </div>
             <input type="hidden" id="amount" name="amount" value="">
@@ -117,7 +121,7 @@ Tor is an essential part of the Internet freedom infrastructure, and I'm looking
   </div>
 
 
-  <!-- PAYPAL -->
+  <!-- DONATION CODE (PayPal and Stripe) -->
   <script type="text/javascript" src="$(DOCROOT)/js/jquery.min.js"></script>
   <script type="text/javascript">
   function displayVals() {
@@ -141,7 +145,7 @@ Tor is an essential part of the Internet freedom infrastructure, and I'm looking
     
     $("button[name='amnt']").click(function () {
       $(".form-control").val(null);
-      $(".error-msg").css("display","none");
+      $("#amount-error-msg").css("display","none");
     });
 
     if (23 <= parseInt($("#amount").val()) && parseInt($("#amount").val()) < 100) {
@@ -171,18 +175,18 @@ Tor is an essential part of the Internet freedom infrastructure, and I'm looking
 
     $("#exampleInputAmount").change(function(){
       if ($("#amount").val() == "" || parseInt($("#amount").val()) < 5) {
-        $(".error-msg").css("display","block");
+        $("#amount-error-msg").css("display","block");
       } else{
-        $(".error-msg").css("display","none");
+        $("#amount-error-msg").css("display","none");
       }
     });
 
     $("#donate-btn").click(function(event){
       if ($("#amount").val() == "" || parseInt($("#amount").val()) < 5) {
         event.preventDefault();
-        $(".error-msg").css("display","block");
+        $("#amount-error-msg").css("display","block");
       } else{
-        $(".error-msg").css("display","none");
+        $("#amount-error-msg").css("display","none");
       }
     });
 
@@ -194,10 +198,29 @@ Tor is an essential part of the Internet freedom infrastructure, and I'm looking
       $(".right").addClass('active');
       $(".left").removeClass('active');
     });
-    
+
   });
 
+  // -------- STRIPE -------------------
+  // The following code sets up the Stripe button.
 
+    $("#donate-stripe-btn").click(function (event) {
+      console.log("clicked stripe button");
+      event.preventDefault();
+      let amount = parseInt($("#amount").val());
+      let monthly = document.querySelector('input[name="cmd"]:checked').value === "_xclick-subscriptions";
+      showStripeTorDonationCheckout(amount, monthly, function (result) {
+        console.log("result: " + JSON.stringify(result));
+        if (result.success) {
+          window.location.href = "thankyou.html.en";
+        } else {
+          window.alert("Donation error: " + result.message);
+          // We use innerText for security reasons.
+          $("#stripe-error-msg").text("Your donation failed. Please try again.").css("display", "block");
+        }
+      });
+    });
   </script>
+
 
 #include <donatefoot.wmi>
