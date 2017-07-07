@@ -1298,3 +1298,13 @@ p.blogDate {
 }
 /* End hide from IE-mac */
 
+.joblink {
+  display: block;
+  font-weight: bold;
+  padding: 10px 5px;
+  text-align: right;
+}
+
+.joblink a {
+  text-decoration: none;
+}
